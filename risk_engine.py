@@ -358,6 +358,26 @@ def _merge_segment_periods(segment_df: pd.DataFrame, company_name: str) -> pd.Da
     if company_segments.empty:
         return pd.DataFrame()
 
+    # Backward-compatible schema normalization for older deployment data.
+    text_defaults = {
+        "portfolio_group": "기업금융",
+        "collateral_type": "미분류 담보",
+        "industry": "미분류 업종",
+    }
+    numeric_defaults = {
+        "balance": 0,
+        "delinquency_rate": 0.0,
+        "customer_count": 0,
+    }
+    for col, default in text_defaults.items():
+        if col not in company_segments.columns:
+            company_segments[col] = default
+        company_segments[col] = company_segments[col].fillna(default)
+    for col, default in numeric_defaults.items():
+        if col not in company_segments.columns:
+            company_segments[col] = default
+        company_segments[col] = company_segments[col].fillna(default)
+
     latest_period = company_segments["date"].max()
     previous_candidates = company_segments[company_segments["date"] < latest_period]["date"]
     if previous_candidates.empty:
@@ -379,8 +399,19 @@ def _merge_segment_periods(segment_df: pd.DataFrame, company_name: str) -> pd.Da
         }
     )
 
-    merge_keys = ["company_name", "portfolio_group", "segment_name", "collateral_type", "industry"]
-    merged = previous_seg.merge(latest_seg, on=merge_keys, how="outer").fillna(0)
+    merge_keys = [col for col in ["company_name", "portfolio_group", "segment_name", "collateral_type", "industry"] if col in previous_seg.columns and col in latest_seg.columns]
+    if not merge_keys:
+        return pd.DataFrame()
+
+    merged = previous_seg.merge(latest_seg, on=merge_keys, how="outer")
+    for col in ["prev_balance", "curr_balance", "prev_delinquency_rate", "curr_delinquency_rate", "prev_customer_count", "curr_customer_count"]:
+        if col not in merged.columns:
+            merged[col] = 0
+        merged[col] = merged[col].fillna(0)
+    for col, default in text_defaults.items():
+        if col in merged.columns:
+            merged[col] = merged[col].fillna(default)
+
     merged["delinquency_delta"] = (merged["curr_delinquency_rate"] - merged["prev_delinquency_rate"]).round(2)
     merged["balance_delta"] = (merged["curr_balance"] - merged["prev_balance"]).round(0)
     merged["customer_delta"] = (merged["curr_customer_count"] - merged["prev_customer_count"]).round(0)
