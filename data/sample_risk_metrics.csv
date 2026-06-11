@@ -10,7 +10,7 @@ date,company_name,company_type,delinquency_rate,complaints,abnormal_events,expos
 2026-03-01,광주은행,Bank,0.79,101,4,19,28
 2026-04-01,광주은행,Bank,0.81,103,4,20,29
 2026-05-01,광주은행,Bank,0.83,106,4,20,30
-2026-06-01,광주은행,Bank,0.94,118,5,22,35
+2026-06-01,광주은행,Bank,0.79,101,4,21,29
 2026-01-01,JB우리캐피탈,Capital,1.42,88,5,34,25
 2026-02-01,JB우리캐피탈,Capital,1.49,91,5,35,26
 2026-03-01,JB우리캐피탈,Capital,1.57,96,6,36,27
@@ -22,4 +22,4 @@ date,company_name,company_type,delinquency_rate,complaints,abnormal_events,expos
 2026-03-01,PPCBank,Overseas Bank,1.02,56,4,22,23
 2026-04-01,PPCBank,Overseas Bank,1.04,58,5,23,23
 2026-05-01,PPCBank,Overseas Bank,1.05,60,5,24,24
-2026-06-01,PPCBank,Overseas Bank,1.09,63,6,25,24
+2026-06-01,PPCBank,Overseas Bank,0.97,55,4,23,23
